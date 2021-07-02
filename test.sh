@@ -15,10 +15,9 @@ export ccount=1
 export semver=1.0.3
 export ccount=$(expr $ccount - 1)
 export patch=$(if [[ $(echo $semver | cut -d. -f3) ]]; then echo $(echo $semver | cut -d. -f3); else echo 0; fi)
-export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); fi)
-export mcount=$(if [[ -z $minor ]]; then echo -1; else echo $minor; fi)
-echo "::set-output name=semver::1.$ccount.$(if [[ $ccount -eq $mcount ]]; then echo $(expr $patch + 1); else echo 0; fi)"
-echo "::set-output name=notes::$(if [[ $ccount -eq $mcount ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
+export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); else echo -1; fi)
+echo "::set-output name=semver::$(echo 1.$ccount.$(if [[ $ccount == $minor ]]; then echo $(expr $patch + 1); else echo 0; fi))"
+echo "::set-output name=notes::$(if [[ $ccount == $minor ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
 
 # ============================================================
 # INPUTS
@@ -35,10 +34,9 @@ export ccount=2
 export semver=1.0.3
 export ccount=$(expr $ccount - 1)
 export patch=$(if [[ $(echo $semver | cut -d. -f3) ]]; then echo $(echo $semver | cut -d. -f3); else echo 0; fi)
-export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); fi)
-export mcount=$(if [[ -z $minor ]]; then echo -1; else echo $minor; fi)
-echo "::set-output name=semver::1.$ccount.$(if [[ $ccount -eq $mcount ]]; then echo $(expr $patch + 1); else echo 0; fi)"
-echo "::set-output name=notes::$(if [[ $ccount -eq $mcount ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
+export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); else echo -1; fi)
+echo "::set-output name=semver::$(echo 1.$ccount.$(if [[ $ccount == $minor ]]; then echo $(expr $patch + 1); else echo 0; fi))"
+echo "::set-output name=notes::$(if [[ $ccount == $minor ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
 
 # ============================================================
 # INPUTS
@@ -55,7 +53,6 @@ export ccount=1
 export semver=
 export ccount=$(expr $ccount - 1)
 export patch=$(if [[ $(echo $semver | cut -d. -f3) ]]; then echo $(echo $semver | cut -d. -f3); else echo 0; fi)
-export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); fi)
-export mcount=$(if [[ -z $minor ]]; then echo -1; else echo $minor; fi)
-echo "::set-output name=semver::1.$ccount.$(if [[ $ccount -eq $mcount ]]; then echo $(expr $patch + 1); else echo 0; fi)"
-echo "::set-output name=notes::$(if [[ $ccount -eq $mcount ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
+export minor=$(if [[ $(echo $semver | cut -d. -f2) ]]; then echo $(echo $semver | cut -d. -f2); else echo -1; fi)
+echo "::set-output name=semver::$(echo 1.$ccount.$(if [[ $ccount == $minor ]]; then echo $(expr $patch + 1); else echo 0; fi))"
+echo "::set-output name=notes::$(if [[ $ccount == $minor ]]; then echo Made minor changes for $calver; else echo Made major changes for $calver; fi)"
