@@ -29,6 +29,7 @@ runs:
         echo "patch<<EOF" >> $GITHUB_ENV
         echo "$(echo ${{ inputs.latest-semver }} | cut -d. -f3)" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+      shell: bash
     - name: Output SemVer release values
       id: format-results
       run: |
