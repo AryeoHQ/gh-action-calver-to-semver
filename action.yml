@@ -23,23 +23,28 @@ runs:
     - name: Parse latest SemVer release
       id: parse-latest-release
       run: |
-        echo "minor<<EOF" >> $GITHUB_ENV
-        echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f2) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f2); else echo -1; fi)" >> $GITHUB_ENV        
-        echo "EOF" >> $GITHUB_ENV
-        echo "patch<<EOF" >> $GITHUB_ENV
-        echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f3) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f3); else echo 0; fi)" >> $GITHUB_ENV        
-        echo "EOF" >> $GITHUB_ENV
+        echo "::set-output name=minor::$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f2) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f2); else echo -1; fi)"
+        echo "::set-output name=patch::$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f3) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f3); else echo 0; fi)"
+      # echo "minor<<EOF" >> $GITHUB_ENV
+      # echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f2) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f2); else echo -1; fi)" >> $GITHUB_ENV
+      # echo "EOF" >> $GITHUB_ENV
+      # echo "patch<<EOF" >> $GITHUB_ENV
+      # echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f3) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f3); else echo 0; fi)" >> $GITHUB_ENV
+      # echo "EOF" >> $GITHUB_ENV
       shell: bash
     - name: Normalize values
       id: normalize-values
       run: |
-        echo "ccount<<EOF" >> $GITHUB_ENV
-        echo "$(expr ${{ inputs.calver-count }} - 1)" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+        echo "::set-output name=ccount::$(expr ${{ inputs.calver-count }} - 1)"
+      # echo "ccount<<EOF" >> $GITHUB_ENV
+      # echo "$(expr ${{ inputs.calver-count }} - 1)" >> $GITHUB_ENV
+      # echo "EOF" >> $GITHUB_ENV
       shell: bash
     - name: Output SemVer release values
       id: format-results
       run: |
-        echo "::set-output name=semver::$(echo 1.${{ env.ccount }}.$(if [[ ${{ env.ccount }} -eq ${{ env.minor }} ]]; then echo $(expr ${{ env.patch }} + 1); else echo 0; fi))"
-        echo "::set-output name=notes::$(if [[ ${{ env.ccount }} -eq ${{ env.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
+        echo "::set-output name=semver::$(echo 1.${{ steps.normalize-values.outputs.ccount }}.$(if [[ ${{ steps.normalize-values.outputs.ccount }} -eq ${{ steps.parse-latest-release.outputs.minor }} ]]; then echo $(expr ${{ steps.parse-latest-release.outputs.patch }} + 1); else echo 0; fi))"
+        echo "::set-output name=notes::$(if [[ ${{ steps.normalize-values.outputs.ccount }} -eq ${{ steps.parse-latest-release.outputs.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
+      # echo "::set-output name=semver::$(echo 1.${{ env.ccount }}.$(if [[ ${{ env.ccount }} -eq ${{ env.minor }} ]]; then echo $(expr ${{ env.patch }} + 1); else echo 0; fi))"
+      # echo "::set-output name=notes::$(if [[ ${{ env.ccount }} -eq ${{ env.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
       shell: bash
