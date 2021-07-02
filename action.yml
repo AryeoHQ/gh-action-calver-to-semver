@@ -1,5 +1,5 @@
 name: "CalVer to SemVer Release"
-description: "Computes SemVer release values for a repository based upon a number of existing CalVer's."
+description: "Computes next SemVer release values."
 inputs:
   calver:
     description: "Current CalVer"
@@ -7,11 +7,8 @@ inputs:
   count-calver:
     description: "Total number of existing CalVer's"
     required: true
-  owner:
-    description: "Owner of repository targeted for SemVer release"
-    required: true
-  repo:
-    description: "Name of repository targeted for SemVer release"
+  latest-semver:
+    description: "Target repository's latest SemVer release"
     required: true
 outputs:
   semver:
@@ -23,23 +20,18 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Get latest release for targeted repository
-      id: get-latest-release
-      uses: pozetroninc/github-action-get-latest-release@master
-      with:
-        owner: ${{ inputs.owner }}
-        repo: ${{ inputs.repo }}
-        excludes: prerelease, draft
-
-    - name: Parse latest release for targeted repository
-      id: get-latest-release-parsed
-      uses: booxmedialtd/ws-action-parse-semver@v1
-      with:
-        input_string: ${{ steps.get-latest-release.outputs.release }}
-
+    - name: Parse latest SemVer release
+      id: parse-latest-release
+      run: |
+        echo "minor<<EOF" >> $GITHUB_ENV
+        echo "$(echo ${{ inputs.latest-semver }} | cut -d. -f2)" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+        echo "patch<<EOF" >> $GITHUB_ENV
+        echo "$(echo ${{ inputs.latest-semver }} | cut -d. -f3)" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
     - name: Output SemVer release values
       id: format-results
       run: |
-        echo "::set-output name=semver::1.${{ inputs.count-calver }}.$(if [[ ${{ inputs.count-calver }} -eq ${{ steps.get-latest-release-parsed.outputs.minor }} ]]; then echo $(expr ${{ steps.get-latest-release-parsed.outputs.patch }} + 1); else echo 0; fi)"
-        echo "::set-output name=notes::$(if [[ ${{ inputs.count-calver }} -eq ${{ steps.get-latest-release-parsed.outputs.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
+        echo "::set-output name=semver::1.${{ inputs.count-calver }}.$(if [[ ${{ inputs.count-calver }} -eq ${{ env.minor }} ]]; then echo $(expr ${{ env.patch }} + 1); else echo 0; fi)"
+        echo "::set-output name=notes::$(if [[ ${{ inputs.count-calver }} -eq ${{ env.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
       shell: bash
