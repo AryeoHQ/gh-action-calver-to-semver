@@ -24,7 +24,7 @@ runs:
       id: parse-latest-release
       run: |
         echo "minor<<EOF" >> $GITHUB_ENV
-        echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f2) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f2); else echo 0; fi)" >> $GITHUB_ENV        
+        echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f2) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f2); fi)" >> $GITHUB_ENV        
         echo "EOF" >> $GITHUB_ENV
         echo "patch<<EOF" >> $GITHUB_ENV
         echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f3) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f3); else echo 0; fi)" >> $GITHUB_ENV        
@@ -37,7 +37,7 @@ runs:
         echo "$(expr ${{ inputs.calver-count }} - 1)" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV      
         echo "minor-count<<EOF" >> $GITHUB_ENV
-        echo "$(if [[ -z ${{ env.minor }} ]]; then echo 0; else echo ${{ env.minor }}; fi)" >> $GITHUB_ENV
+        echo "$(if [[ -z ${{ env.minor }} ]]; then echo -1; else echo ${{ env.minor }}; fi)" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
       shell: bash
     - name: Output SemVer release values
