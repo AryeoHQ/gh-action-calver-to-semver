@@ -30,16 +30,19 @@ runs:
         echo "$(if [[ $(echo ${{ inputs.latest-semver }} | cut -d. -f3) ]]; then echo $(echo ${{ inputs.latest-semver }} | cut -d. -f3); else echo 0; fi)" >> $GITHUB_ENV        
         echo "EOF" >> $GITHUB_ENV
       shell: bash
-    - name: Decrement CalVer count
-      id: decrement-calver-count
+    - name: Normalize values
+      id: normalize-values
       run: |
-        echo "new-calver-count<<EOF" >> $GITHUB_ENV
-        echo "$(if [[ $(expr ${{ inputs.calver-count }} - 1) -lt 0 ]]; then echo 0; else echo $(expr ${{ inputs.calver-count }} - 1); fi)" >> $GITHUB_ENV
+        echo "calver-count<<EOF" >> $GITHUB_ENV
+        echo "$(expr ${{ inputs.calver-count }} - 1)" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV      
+        echo "minor-count<<EOF" >> $GITHUB_ENV
+        echo "$(if [[ -z ${{ env.minor }} ]]; then echo 0; else echo ${{ env.minor }}; fi)" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
       shell: bash
     - name: Output SemVer release values
       id: format-results
       run: |
-        echo "::set-output name=semver::1.${{ env.new-calver-count }}.$(if [[ ${{ env.new-calver-count }} -eq ${{ env.minor }} ]]; then echo $(expr ${{ env.patch }} + 1); else echo 0; fi)"
-        echo "::set-output name=notes::$(if [[ ${{ env.new-calver-count }} -eq ${{ env.minor }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
+        echo "::set-output name=semver::1.${{ env.calver-count }}.$(if [[ ${{ env.calver-count }} -eq ${{ env.minor-count }} ]]; then echo $(expr ${{ env.patch }} + 1); else echo 0; fi)"
+        echo "::set-output name=notes::$(if [[ ${{ env.calver-count }} -eq ${{ env.minor-count }} ]]; then echo Made minor changes for ${{ inputs.calver }}; else echo Made major changes for ${{ inputs.calver }}; fi)"
       shell: bash
